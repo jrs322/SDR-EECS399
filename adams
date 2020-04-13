@@ -1,0 +1,35 @@
+from tkinter import *
+from PIL import Image, ImageTk
+
+root = Tk()
+
+def fmWorks():
+        print("FM Works!")
+    
+def digitalWorks():
+        print("Digital Works!")
+        
+#def scanWorks(self):
+        #print("Scan Works!")
+
+canvas = Canvas(root, width = 170, height = 460)
+canvas.pack()
+img = ImageTk.PhotoImage(Image.open("nokia.bmp"))
+canvas.create_image(1,1, anchor=NW, image= img)
+
+b = Button(root, text = "QUIT", fg = "red", command = quit)
+b.pack()
+b_window = canvas.create_window(25, 125, anchor = NW, window = b)
+
+fm = Button(root, text = "FM", command = fmWorks)
+fm.pack()
+fm_window = canvas.create_window(90, 125, anchor = NW, window = fm)
+
+digital = Button(root, text = "Digital", command = digitalWorks)
+digital.pack()
+digital_window = canvas.create_window(25, 160, anchor = NW, window = digital)
+#scan = Button(root, text = "Scan", command = scanWorks)
+#scan.pack()
+#scan_window = canvas.create_window(10, 40, anchor = NW, window = scan)
+
+mainloop()
