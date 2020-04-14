@@ -3,33 +3,47 @@ from PIL import Image, ImageTk
 
 root = Tk()
 
-def fmWorks():
-        print("FM Works!")
-    
-def digitalWorks():
-        print("Digital Works!")
-        
-#def scanWorks(self):
-        #print("Scan Works!")
-
 canvas = Canvas(root, width = 170, height = 460)
 canvas.pack()
 img = ImageTk.PhotoImage(Image.open("nokia.bmp"))
 canvas.create_image(1,1, anchor=NW, image= img)
 
-b = Button(root, text = "QUIT", fg = "red", command = quit)
-b.pack()
-b_window = canvas.create_window(25, 125, anchor = NW, window = b)
+def bPressed():
+    print("Next Page")
+def scan():
+    scanning = Label(root, text = "Scanning\n\n")
+    scanning.pack()
+    canvas.create_window(85,160, window=scanning)
+def fm():
+    fmListen = Label(root, text = " 1. 88.5  \n 2. 101.3  \n 3. 107.7  ")
+    fmListen.pack()
+    canvas.create_window(85,160, window=fmListen)
+def digital():
+    digListen = Label(root, text = "  1. 100  \n  2. 200  \n  3. 300  ")
+    digListen.pack()
+    canvas.create_window(85,160, window=digListen)
+        
+def createBoard():
+    options = Label(root, text = "1.Scan\n2.FM\n3.Digital")
+    options.pack()
+    canvas.create_window(85,160, window=options)
+    
+    b1 = Button(root, text = "1", command = scan)
+    b1.pack()
+    canvas.create_window(25,295, anchor=NW, window=b1)
+    b2 = Button(root, text = "2", command = fm)
+    b2.pack()
+    canvas.create_window(70,295, anchor=NW, window=b2)
+    b3 = Button(root, text = "3", command = digital)
+    b3.pack()
+    canvas.create_window(115,295, anchor=NW, window=b3)
+    
+    lB = Button(root, text = "<-", command = bPressed)
+    lB.pack()
+    canvas.create_window(30,225, anchor=NW, window=lB)
+    rB = Button(root, text = "->", command = bPressed)
+    rB.pack()
+    canvas.create_window(105,225, anchor=NW, window=rB)
 
-fm = Button(root, text = "FM", command = fmWorks)
-fm.pack()
-fm_window = canvas.create_window(90, 125, anchor = NW, window = fm)
-
-digital = Button(root, text = "Digital", command = digitalWorks)
-digital.pack()
-digital_window = canvas.create_window(25, 160, anchor = NW, window = digital)
-#scan = Button(root, text = "Scan", command = scanWorks)
-#scan.pack()
-#scan_window = canvas.create_window(10, 40, anchor = NW, window = scan)
-
-mainloop()
+createBoard()
+root.mainloop()
