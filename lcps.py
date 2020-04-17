@@ -1,113 +1,100 @@
 from tkinter import *
 from PIL import Image, ImageTk
+from functools import partial
 
-#tkinter canvas setup
+#### TKINTER CANVAS SETUP ####
 root = Tk()
+root.title("LOW COST SDR")
 canvas = Canvas(root, width = 180, height = 518)
 canvas.pack()
 img = ImageTk.PhotoImage(Image.open("nokia.jpg"))
 canvas.create_image(1,1, anchor=NW, image=img)
 
-#global variables
+#### GLOBAL VARIABLES ####
 currentScreen = "home"
-currentFM = 0
-currentDigital = 0
-
+currentFilesPage = 0
+currentPath = ""
 
 #### SCREEN DRAWING ####
-def home():
+def draw_screen(text):
     global currentScreen
-    options = Label(root, text = "1.Scan\n2.FM\n3.Digital", height=4, width=11, bg='#8c8868')
+    options = Label(root, text = text, height=4, width=11, bg='#8c8868')
     canvas.create_window(88, 222, window=options)
+
+#### HOME SCREEN, RESET PLAYBACK HERE ####
+def home():
+    global currentScreen, currentPath, currentFilesPage
     currentScreen = "home"
+    currentPath = ""
+    currentFilesPage = 0
+    display_files()
+    #end playback
 
-def scan():
-    global currentScreen
-    scanning = Label(root, text = "Scanning\n\n", height=4, width=11, bg='#8c8868')
-    scanning.pack()
-    canvas.create_window(88, 222, window=scanning)
-    currentScreen = "scan"
+#### DISPLAYING FILES FOR FM AND DIGITAL BROWSING ####
+def display_files():
+    global currentScreen, currentPath, currentFilesPage
 
-def fm():
-    global currentScreen, currentFM
+    # normally this array would be populated from the current path... but
+    # for now we'll use a dummy system
+    #files = ["SCAN", "FM", "DIGITAL"] # DUMMY SYSTEM
+    files = ["OHIO", "PORTLAND", "CLE", "BOSTON", "PITTS", "COLUMBUS"] # DUMMY SYSTEM
 
-    #Get channel array and form screen text label
-    channels = ["88.5", "101.3", "107.7", "97.9", "102.8", "89.9"]
-    text = " 1. {}  \n 2. {}  \n 3. {}  ".format(channels[currentFM], channels[currentFM+1], channels[currentFM+2])
+    text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(currentFilesPage*3)], files[(currentFilesPage*3)+1], files[(currentFilesPage*3)+2])
+    draw_screen(text)
 
-    #Draw screen
-    fmListen = Label(root, text = text, height=4, width=11, bg='#8c8868')
-    fmListen.pack()
-    canvas.create_window(88, 222, window=fmListen)
-    currentScreen = "fm"
+#### SELECTION OF FILES ####
+def interpret_selection(selnum):
+    # if selection is of tsv file then...
+    play(3)
+    # if selection is of folder type then...
+    # append selection to current path
+    #display_files()
 
-def digital():
-    global currentScreen, currentDigital
+#### PLAYING TSV FILES WITH PROPER ARGUEMENTS ####
+def play(num):
+    channelExample = "88.5"
+    channelExampleName = "CWRU News"
+    text = "{} {}\n{}".format("FM", channelExampleName, channelExample)
 
-    #Get channel array and form screen text label
-    channels = ["88.5", "101.3", "107.7", "97.9", "102.8", "89.9"]
-    text = " 1. {}  \n 2. {}  \n 3. {}  ".format(channels[currentFM], channels[currentFM+1], channels[currentFM+2])
-
-    #draw screen
-    digListen = Label(root, text = "  1. 100  \n  2. 200  \n  3. 300  ", height=4, width=11, bg='#8c8868')
-    digListen.pack()
-    canvas.create_window(88, 222, window=digListen)
-    currentScreen = "digital"
-
+    draw_screen(text)
 
 #### BUTTON HANDLING ####
-def b1Pressed():
-    global currentScreen
-    if(currentScreen == "home"):
-        scan()
+def button_handler(press):
+    global currentScreen, currentFM, currentDigital, currentFilesPage
 
-def b2Pressed():
-    global currentScreen
-    if(currentScreen == "home"):
-        fm()
-
-def b3Pressed():
-    global currentScreen
-    if(currentScreen == "home"):
-        digital()
-
-def nPressed():
-    global currentScreen, currentFM
-    if(currentScreen == "fm"):
-        currentFM += 1
-        fm()
-
-def pPressed():
-    global currentScreen, currentFM
-    if(currentScreen == "fm"):
-        currentFM -= 1
-        fm()
-
+    if(press == "n"):
+        currentFilesPage += 1
+        display_files()
+    elif(press == "p"):
+        currentFilesPage -= 1
+        display_files()
+    else:
+        interpret_selection(press)
 
 #### START UP DEVICE ####
 def initilize():
 
     #main menu
-    home()
+    display_files()
 
     #b1
-    b1 = Button(root, text = "1", command = b1Pressed, height=1, width=3)
+    b1 = Button(root, text = "1", command = partial(button_handler, "1"), height=1, width=3)
     canvas.create_window(27,348, anchor=NW, window=b1)
 
     #b2
-    b2 = Button(root, text = "2", command = b2Pressed, height=1, width=3)
+    b2 = Button(root, text = "2", command = partial(button_handler, "2"), height=1, width=3)
     canvas.create_window(75,348, anchor=NW, window=b2)
 
     #b3
-    b3 = Button(root, text = "3", command = b3Pressed, height=1, width=3)
+    b3 = Button(root, text = "3", command = partial(button_handler, "3"), height=1, width=3)
     canvas.create_window(122,348, anchor=NW, window=b3)
 
     #previous button
-    pB = Button(root, text = "<-", command = pPressed)
+    pB = Button(root, text = "<-", command = partial(button_handler, "p"))
     canvas.create_window(128,280, anchor=NW, window=pB)
 
     #next button
-    nB = Button(root, text = "->", command = nPressed)
+    nB = Button(root, text = "->", command = partial(button_handler, "n"))
     canvas.create_window(122,313, anchor=NW, window=nB)
 
     #home button
