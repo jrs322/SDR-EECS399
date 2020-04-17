@@ -43,9 +43,10 @@ class radio_file_browser():
     def get_previous_path(self):
         if len(self.file_tree) == 1:
             self.file_tree.pop()
-            return self.get_init_path()
+            self.current_path = self.get_init_path()
+            self.current_file_contents = self.get_folder_contents(self.current_path)
         if len(self.file_tree) == 0:
-            return self.current_path
+            self.current_path = self.current_path
         else:
             self.file_tree.pop()
             self.current_path = self.file_tree[-1]
