@@ -39,6 +39,10 @@ class radio_file_browser():
         self.current_path = self.current_path + "/" +file_name
         self.file_tree.append(self.current_path)
         self.current_file_contents = self.get_folder_contents(self.current_path)
+    
+    def go_home(self):
+        self.current_path=self.get_init_path()
+        self.current_file_contents = get_folder_contents(self.current_path)
         
     def get_previous_path(self):
         if len(self.file_tree) == 1:
