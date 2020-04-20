@@ -1,0 +1,20 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/jrs322/SDR-EECS399.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[branch "rtl_fm_wip"]
+	remote = origin
+	merge = refs/heads/rtl_fm_wip
+[branch "file_browser"]
+	remote = origin
+	merge = refs/heads/file_browser
+[branch "Clancy"]
+	remote = origin
+	merge = refs/heads/Clancy
