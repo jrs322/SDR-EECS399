@@ -1,6 +1,7 @@
 from tkinter import *
 from PIL import Image, ImageTk
 from functools import partial
+from file_browser import radio_file_browser
 
 class RadioGUI():
 
@@ -13,7 +14,7 @@ class RadioGUI():
         self.current_file_page = 0
         self.initialize()
         self.canvas_setup()
-        
+        self.file_browser = radio_file_browser()
         
     def canvas_setup(self):
         self.root = Tk()
