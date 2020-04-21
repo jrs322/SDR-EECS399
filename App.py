@@ -2,7 +2,8 @@ from tkinter import *
 from PIL import Image, ImageTk
 from functools import partial
 from file_browser import radio_file_browser
-import os
+import time
+
 
 class RadioGUI():
 
@@ -14,6 +15,9 @@ class RadioGUI():
         self.current_screen = "Home"
         self.current_file_page = 0
         self.file_browser = radio_file_browser()
+        self.canvas_setup()
+        self.initialize_buttons()
+        self.root.mainloop()
         
     def canvas_setup(self):
         self.root = Tk()
@@ -22,17 +26,19 @@ class RadioGUI():
         self.canvas.pack()
         self.img = ImageTk.PhotoImage(Image.open("nokia.jpg"))
         self.canvas.create_image(1, 1, anchor=NW, image =self.img)
-    
+        
     def draw_screen(self, text):
         options = Label(self.root, text=text, height=4, width=11, bg='#8c8868')
-        self.canvas.create_window(7, 222, window=options)
+        self.canvas.create_window(88, 222, window=options)
     
     def display_files(self, files):
         filler_needed = len(files)%3
+        print(filler_needed)
         for i in range(0, 3-filler_needed):
-            files.append(" ")
-        max_page_limit = len(files)/3
-        if max_page_limit < self.current_file_page or 0 > self.current_file_page:
+            self.file_browser.current_file_contents.append("N/A")
+            print(self.file_browser.current_file_contents)
+        max_pages = len(files)/3
+        if self.current_file_page > max_pages or 0 > self.current_file_page:
             print("Max or Min limit reached")
             return None
         text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)],
@@ -54,7 +60,7 @@ class RadioGUI():
         elif(self.current_screen == "Digital"):
             self.button_handler_radio(press)
         elif(self.current_screen == "Playing"):
-           self.button_handler_playing(press)
+            self.button_handler_playing(press)
            
     def button_handler_home(self, press):
         if(press == "1"):
@@ -75,6 +81,8 @@ class RadioGUI():
                 #set new path display
                 self.file_browser.get_new_path(self.file_browser.current_file_contents[int(press)])
                 self.display_files(self.file_browser.get_current_contents())
+            elif(self.file_browser.current_file_contents[int(press)][0:3] == "N/A"):
+                print("Doing Nothing")
             else:
                 if(self.current_screen == "Digital"):
                     self.play_digital()
@@ -86,7 +94,7 @@ class RadioGUI():
             self.current_file_page+=1
             self.display_files(self.file_browser.get_current_contents())
         elif(press == "p"):
-            self.current_file_page+=1
+            self.current_file_page-=1
             self.display_files(self.file_browser.get_current_contents())
         elif(press == "Home"):
             self.current_file_page=0
@@ -118,10 +126,6 @@ class RadioGUI():
         
         hB = Button(self.root, text = "Home", command = partial(self.button_handler, "Home"))
         self.canvas.create_window(69, 280, anchor=NW, window=hB)
-        
-    def run(self):
-        self.canvas_setup()
-        self.initialize_buttons()
 
+                  
 myApp = RadioGUI()
-myApp.run()
