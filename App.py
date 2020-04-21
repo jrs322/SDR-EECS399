@@ -2,107 +2,126 @@ from tkinter import *
 from PIL import Image, ImageTk
 from functools import partial
 from file_browser import radio_file_browser
+import os
 
 class RadioGUI():
 
     current_screen = "home"
     current_file_page = 0
-    file_type = "Folder"
-    current_files = []
     max_page_limit = 0
     
     def __init__(self):
         self.current_screen = "Home"
         self.current_file_page = 0
-        self.initialize()
-        self.canvas_setup()
         self.file_browser = radio_file_browser()
         
     def canvas_setup(self):
         self.root = Tk()
         self.root.title("LOW COST SDR")
-        self.canvas = Canvas(root, width = 100, height = 518)
+        self.canvas = Canvas(self.root, width = 200, height = 518)
         self.canvas.pack()
-        self.img = ImageTk.PhotoImage(Image.open("nokia,jpg"))
+        self.img = ImageTk.PhotoImage(Image.open("nokia.jpg"))
         self.canvas.create_image(1, 1, anchor=NW, image =self.img)
     
     def draw_screen(self, text):
-        options = Label(root, text=text, height=4, width=11, bg='#8c8868')
-        self.canvas.create_window(88, 222, window=options)
+        options = Label(self.root, text=text, height=4, width=11, bg='#8c8868')
+        self.canvas.create_window(7, 222, window=options)
     
     def display_files(self, files):
-        filler_needed = len(files)//3
-        for i in range(0, filler_needed):
+        filler_needed = len(files)%3
+        for i in range(0, 3-filler_needed):
             files.append(" ")
-        self.max_page_limit = len(files)/3
+        max_page_limit = len(files)/3
+        if max_page_limit < self.current_file_page or 0 > self.current_file_page:
+            print("Max or Min limit reached")
+            return None
         text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)],
                                                      files[(self.current_file_page*3)+1],
                                                      files[(self.current_file_page*3)+2])
-        self.current_files[0] = files[(self.current_file_page*3)]
-        self.current_files[1] = files[(self.current_file_page*3)+1]
-        self.current_files[2] = files[(self.current_file_page*3)+2]
         self.draw_screen(text)
     
-    def play_station(self, frequency, sample_rate, gain=0):
+    def play_fm(self, frequency, sample_rate, gain=0):
+        return None
+    
+    def play_digital(self, file_name):
         return None
     
     def button_handler(self, press):
-        if(self.current_screen = "Home"):
-            
-        elif(self.current_screen = "FM"):
-        
-        elif(self.current_screen = "Digital"):
-            
-        elif(self.current_screen = "Playing"):
-           
+        if(self.current_screen == "Home"):
+            self.button_handler_home(press)
+        elif(self.current_screen == "FM"):
+            self.button_handler_radio(press)
+        elif(self.current_screen == "Digital"):
+            self.button_handler_radio(press)
+        elif(self.current_screen == "Playing"):
+           self.button_handler_playing(press)
            
     def button_handler_home(self, press):
-        if(press = "1"):
-            self.file_browser.get_new_path(self.current_files[0])
+        if(press == "1"):
+            self.file_browser.get_new_path(self.file_browser.current_file_contents[0])
+            self.display_files(self.file_browser.get_current_contents())
+            self.current_screen = "FM"
+        elif(press == "2"):
+            self.file_browser.get_new_path(self.file_browser.current_file_contents[1])
+            self.display_files(self.file_browser.get_current_contents())
+            self.current_screen = "Digital"
             
-        elif(press = "2"):
-            
-        elif(press = "3"):
-    
-    
-    def button_handler_FM(self, press):
-        if(press = "1"):
-            self.file_browser
-        elif(press = "2"):
-            
-        elif(press = "3"):
-    
-    def button_handler_digital(self, press):
-        if(press = "1"):
-            self.file_browser
-        elif(press = "2"):
-            
-        elif(press = "3"):
+    def button_handler_radio(self, press):
+        if(press == "1" or press == "2" or press == "3" ):
+            #need to check files if they are more folders or not
+            #if go into a folder reset page count
+            self.current_page = 0
+            if(self.file_browser.current_file_contents[int(press)][0:2] == "m_"):
+                #set new path display
+                self.file_browser.get_new_path(self.file_browser.current_file_contents[int(press)])
+                self.display_files(self.file_browser.get_current_contents())
+            else:
+                if(self.current_screen == "Digital"):
+                    self.play_digital()
+                    self.current_screen = "Playing"
+                else:
+                    self.play_fm()
+                    self.current_screen = "Playing"
+        elif(press == "n"):
+            self.current_file_page+=1
+            self.display_files(self.file_browser.get_current_contents())
+        elif(press == "p"):
+            self.current_file_page+=1
+            self.display_files(self.file_browser.get_current_contents())
+        elif(press == "Home"):
+            self.current_file_page=0
+            self.file_browser.go_home()
+            self.display_files(self.file_browser.get_current_contents())
             
     def button_handler_playing(self, press):
-        if(press = "1"):
-            self.file_browser
-        elif(press = "2"):
-            
-        elif(press = "3"):
+        if(press == "Home"):
+            self.current_file_page=0
+            self.file_browser.go_home()
+            self.display_files(self.file_browser.get_current_contents())
             
             
     def initialize_buttons(self):
-        b1 = Button(root, text = "1", command = partial(button_handler, "1"), height=1, width=3)
+        b1 = Button(self.root, text = "1", command = partial(self.button_handler, "1"), height=1, width=3)
         self.canvas.create_window(27,348, anchor=NW, window=b1)
         #b2
-        b2 = Button(root, text = "2", command = partial(button_handler, "2"), height=1, width=3)
+        b2 = Button(self.root, text = "2", command = partial(self.button_handler, "2"), height=1, width=3)
         self.canvas.create_window(75,348, anchor=NW, window=b2)
         #b3
-        b3 = Button(root, text = "3", command = partial(button_handler, "3"), height=1, width=3)
+        b3 = Button(self.root, text = "3", command = partial(self.button_handler, "3"), height=1, width=3)
         self.canvas.create_window(122,348, anchor=NW, window=b3)
         #previous button
-        pB = Button(root, text = "<-", command = partial(button_handler, "p"))
+        pB = Button(self.root, text = "<-", command = partial(self.button_handler, "p"))
         self.canvas.create_window(128,280, anchor=NW, window=pB)
         #next button
-        nB = Button(root, text = "->", command = partial(button_handler, "n"))
+        nB = Button(self.root, text = "->", command = partial(self.button_handler, "n"))
         self.canvas.create_window(122,313, anchor=NW, window=nB)
-    
-    def run(self):
         
+        hB = Button(self.root, text = "Home", command = partial(self.button_handler, "Home"))
+        self.canvas.create_window(69, 280, anchor=NW, window=hB)
+        
+    def run(self):
+        self.canvas_setup()
+        self.initialize_buttons()
 
+myApp = RadioGUI()
+myApp.run()
