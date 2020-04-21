@@ -1,8 +1,0 @@
-#!/bin/bash
-#Name - rtl_fm_script.sh
-
-if [$(cat power.txt) = "True"]; then
-    rtl_fm $(cat  -r 32k | play -r 32k -t raw -e s -b 16 -c 1 -V1 -
-elif [$(cat power.txt) = "False"]; then
-    killall rtl_fm
-fi

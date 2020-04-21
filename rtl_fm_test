@@ -1,0 +1,10 @@
+#!/bin/bash
+line=$(head -n 1 "power.txt")
+
+if [[ $line = "True" ]]; then
+  rtl_fm "$(< current_settings.txt)" | play -r 32k -t raw -e s -b 16 -c 1 -V1 - &  
+elif [[ $line = "False" ]]; then
+  killall "rtl_fm"
+else
+  echo "word not recognized"
+fi

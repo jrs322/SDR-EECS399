@@ -55,19 +55,3 @@ class radio_file_browser():
             self.file_tree.pop()
             self.current_path = self.file_tree[-1]
             self.current_file_contents = self.get_folder_contents(self.current_path)
-
-rfb = radio_file_browser()
-print(rfb.get_current_path())
-print(rfb.get_current_contents())
-print(rfb.get_file_tree())
-def test_adding_to_path():
-    rfb.get_new_path(rfb.get_current_contents()[1])
-    return (rfb.get_current_path())
-def test_removing_from_path():
-    rfb.get_new_path(rfb.get_current_contents()[1])
-    print("Pre: " + rfb.get_current_path())
-    rfb.get_previous_path()
-    return (rfb.get_current_path())
-
-print(test_adding_to_path())
-print("Post: " + test_removing_from_path())

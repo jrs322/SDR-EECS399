@@ -9,6 +9,8 @@ class RadioGUI():
 
     current_screen = "home"
     current_file_page = 0
+    current_info = ""
+    current_freq = ""
     max_page_limit = 0
     
     def __init__(self):
@@ -39,7 +41,6 @@ class RadioGUI():
         if filler_needed > 0:
             for i in range(0, 3-filler_needed):
                 self.file_browser.current_file_contents.append("N/A")
-                print(self.file_browser.current_file_contents)
         max_pages = len(files)/3
         if self.current_file_page > max_pages-1 or 0 > self.current_file_page:
             print("Max or Min limit reached")
@@ -49,10 +50,33 @@ class RadioGUI():
                                                      files[(self.current_file_page*3)+2])
         self.draw_screen(text)
     
-    def play_fm(self, frequency, sample_rate, gain=0):
-        return None
-    
-    def play_digital(self, file_name):
+    def play_fm(self, filename):
+        #open the file
+        file = open(self.file_browser.current_path + "/" + filename, "r")
+        #gather all the data for the signal
+        contents = file.readlines()
+        for c in contents:
+            c = c.strip()
+        self.now_playing = contents[0]
+        frequency = contents[1]
+        self.current_freq = frequency
+        mode = contents[2]
+        sample_rate = contents[3]
+        file.close()
+        self.file_browser.go_home()
+        file = open("current_settings.txt", "w")
+        file.write("-f {} -M {} -s {}".format(frequency.strip(), mode.strip(), sample_rate.strip()))
+        file.close()
+        lock = open("lock.txt", "r")
+        power = open("power.txt", "w")
+        while lock.readline(0).strip() == "True":
+            time.sleep(1)
+        power.write('True')
+        lock.close()
+        power.close()
+        #set now_playing
+        
+    def play_digital(self):
         return None
     
     def button_handler(self, press):
@@ -69,31 +93,37 @@ class RadioGUI():
         if(press == "1"):
             self.file_browser.get_new_path(self.file_browser.current_file_contents[0])
             self.display_files(self.file_browser.get_current_contents())
-            self.current_screen = "FM"
+            self.current_screen = "Digital"
         elif(press == "2"):
             self.file_browser.get_new_path(self.file_browser.current_file_contents[1])
             self.display_files(self.file_browser.get_current_contents())
-            self.current_screen = "Digital"
+            self.current_screen = "FM"
             
     def button_handler_radio(self, press):
         if(press == "1" or press == "2" or press == "3" ):
             #need to check files if they are more folders or not
             #if go into a folder reset page count
             self.current_file_page = 0
-            print(self.file_browser.current_file_contents)
             if(self.file_browser.current_file_contents[int(press)-1][0:2] == "m_"):
                 #set new path display
-                self.file_browser.get_new_path(self.file_browser.current_file_contents[int(press)])
+                self.file_browser.get_new_path(self.file_browser.current_file_contents[int(press)-1])
                 self.display_files(self.file_browser.get_current_contents())
             elif(self.file_browser.current_file_contents[int(press)-1][0:3] == "N/A"):
                 print("Doing Nothing")
             else:
+                print("here in else")
+                print(self.current_screen)
                 if(self.current_screen == "Digital"):
                     self.play_digital()
                     self.current_screen = "Playing"
+                    #draw playing screen
                 else:
-                    self.play_fm()
+                    print("here about to play")
+                    self.play_fm(self.file_browser.current_file_contents[int(press)-1])
                     self.current_screen = "Playing"
+                    #draw playing screen
+                    text = "{} {}\n{}".format("FM", self.current_freq, self.current_info)
+                    self.draw_screen(text)
         elif(press == "n"):
             self.current_file_page+=1
             self.display_files(self.file_browser.get_current_contents())
@@ -102,6 +132,7 @@ class RadioGUI():
             self.display_files(self.file_browser.get_current_contents())
         elif(press == "Home"):
             self.current_file_page=0
+            self.current_screen = "Home"
             self.file_browser.go_home()
             self.display_files(self.file_browser.get_current_contents())
             
@@ -109,7 +140,13 @@ class RadioGUI():
         if(press == "Home"):
             self.current_file_page=0
             self.file_browser.go_home()
+            self.current_screen = "Home"
             self.display_files(self.file_browser.get_current_contents())
+            lock = open("lock.txt", "r")
+            power = open("power.txt", "w")
+            while lock.readline(0) == "True":
+                time.sleep(1)
+            power.write('False')
             
             
     def initialize_buttons(self):
