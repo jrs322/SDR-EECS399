@@ -17,7 +17,9 @@ class RadioGUI():
         self.file_browser = radio_file_browser()
         self.canvas_setup()
         self.initialize_buttons()
+        self.display_files(self.file_browser.get_current_contents())
         self.root.mainloop()
+        
         
     def canvas_setup(self):
         self.root = Tk()
@@ -34,11 +36,12 @@ class RadioGUI():
     def display_files(self, files):
         filler_needed = len(files)%3
         print(filler_needed)
-        for i in range(0, 3-filler_needed):
-            self.file_browser.current_file_contents.append("N/A")
-            print(self.file_browser.current_file_contents)
+        if filler_needed > 0:
+            for i in range(0, 3-filler_needed):
+                self.file_browser.current_file_contents.append("N/A")
+                print(self.file_browser.current_file_contents)
         max_pages = len(files)/3
-        if self.current_file_page > max_pages or 0 > self.current_file_page:
+        if self.current_file_page > max_pages-1 or 0 > self.current_file_page:
             print("Max or Min limit reached")
             return None
         text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)],
@@ -76,12 +79,13 @@ class RadioGUI():
         if(press == "1" or press == "2" or press == "3" ):
             #need to check files if they are more folders or not
             #if go into a folder reset page count
-            self.current_page = 0
-            if(self.file_browser.current_file_contents[int(press)][0:2] == "m_"):
+            self.current_file_page = 0
+            print(self.file_browser.current_file_contents)
+            if(self.file_browser.current_file_contents[int(press)-1][0:2] == "m_"):
                 #set new path display
                 self.file_browser.get_new_path(self.file_browser.current_file_contents[int(press)])
                 self.display_files(self.file_browser.get_current_contents())
-            elif(self.file_browser.current_file_contents[int(press)][0:3] == "N/A"):
+            elif(self.file_browser.current_file_contents[int(press)-1][0:3] == "N/A"):
                 print("Doing Nothing")
             else:
                 if(self.current_screen == "Digital"):
