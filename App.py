@@ -12,6 +12,9 @@ class RadioGUI():
     current_info = ""
     current_freq = ""
     max_page_limit = 0
+    average_time = 0
+    start_time = 0
+    end_time = 0
     
     def __init__(self):
         self.current_screen = "Home"
@@ -34,20 +37,30 @@ class RadioGUI():
     def draw_screen(self, text):
         options = Label(self.root, text=text, height=4, width=11, bg='#8c8868')
         self.canvas.create_window(88, 222, window=options)
+        end_time = time.time()
+        elapsed_time = end_time-self.start_time
+        self.average_time = (self.average_time+elapsed_time)/2
+        print("Elapsed time: {}".format(elapsed_time))
+        print("Average time: {}".format(self.average_time))
     
     def display_files(self, files):
         filler_needed = len(files)%3
         print(filler_needed)
         if filler_needed > 0:
             for i in range(0, 3-filler_needed):
-                self.file_browser.current_file_contents.append("N/A")
+                self.file_browser.current_file_contents.append("NA__")
         max_pages = len(files)/3
         if self.current_file_page > max_pages-1 or 0 > self.current_file_page:
             print("Max or Min limit reached")
             return None
-        text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)],
-                                                     files[(self.current_file_page*3)+1],
-                                                     files[(self.current_file_page*3)+2])
+        if files[(self.current_file_page*3)][0:2] == "m_":
+            text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)][2:],
+                                                         files[(self.current_file_page*3)+1][2:],
+                                                         files[(self.current_file_page*3)+2][2:])
+        else:
+            text = " 1. {}  \n 2. {}  \n 3. {}  ".format(files[(self.current_file_page*3)][:-4],
+                                                         files[(self.current_file_page*3)+1][:-4],
+                                                         files[(self.current_file_page*3)+2][:-4])
         self.draw_screen(text)
     
     def play_fm(self, filename):
@@ -80,6 +93,7 @@ class RadioGUI():
         return None
     
     def button_handler(self, press):
+        self.start_time = time.time()
         if(self.current_screen == "Home"):
             self.button_handler_home(press)
         elif(self.current_screen == "FM"):

@@ -1,10 +1,20 @@
 #!/bin/bash
-line=$(head -n 1 "power.txt")
 
-if [[ $line = "True" ]]; then
-  rtl_fm "$(< current_settings.txt)" | play -r 32k -t raw -e s -b 16 -c 1 -V1 - &  
+STR="Off"
+while true; do
+  echo "True" > lock.txt
+  line=$(head -n 1 "power.txt")
+  if [[ $line = "True" ]]; then
+    if [[ $STR = "Off" ]]; then
+      rtl_fm "$(< current_settings.txt)" | play -r 32k -t raw -e s -b 16 -c 1 -V1 - &  
+      STR="On"
+    fi
 elif [[ $line = "False" ]]; then
-  killall "rtl_fm"
-else
-  echo "word not recognized"
+  if [[ $STR = "On" ]]; then
+    killall "rtl_fm"
+    STR="Off"
+  fi
 fi
+  echo "False" > lock.txt
+  sleep 5;
+done
