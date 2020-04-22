@@ -1,5 +1,5 @@
 from tkinter import *
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw, ImageFont
 from functools import partial
 from file_browser import radio_file_browser
 import time
@@ -35,13 +35,25 @@ class RadioGUI():
         self.canvas.create_image(1, 1, anchor=NW, image =self.img)
         
     def draw_screen(self, text):
+        #drawing for simulation screen
         options = Label(self.root, text=text, height=4, width=11, bg='#8c8868')
         self.canvas.create_window(88, 222, window=options)
-        end_time = time.time()
-        elapsed_time = end_time-self.start_time
-        self.average_time = (self.average_time+elapsed_time)/2
-        print("Elapsed time: {}".format(elapsed_time))
-        print("Average time: {}".format(self.average_time))
+
+        #drawing image for hardware screen
+        image = Image.new('RGB', (84, 48), (255, 255, 255))
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.truetype("TNRB.ttf", 13)
+        draw.text((0,0), text, font=font, fill=(0,0,0,255))
+        image.save("nokia_screen_output.jpg")
+
+        #sending image to hardware screen
+        #https://github.com/adafruit/Adafruit_CircuitPython_PCD8544/blob/master/examples/pcd8544_pillow_demo.py
+
+        #end_time = time.time()
+        #elapsed_time = end_time-self.start_time
+        #self.average_time = (self.average_time+elapsed_time)/2
+        #print("Elapsed time: {}".format(elapsed_time))
+        #print("Average time: {}".format(self.average_time))
     
     def display_files(self, files):
         filler_needed = len(files)%3
